@@ -31,23 +31,23 @@ public:
         std::cout << "[" << x << "," << y << "," << z << "]" << std::endl;
     };
 
-    const vec & operator*(const double &s) {
+    const vec operator*(const double &s) {
         return vec(x * s, y * s, z * s);
     };
     
-    const vec & operator/(const double &s) {
+    const vec operator/(const double &s) {
         return vec(x / s, y / s, z / s);
     };
 
-    const vec & operator+(const vec &other) {
+    const vec operator+(const vec &other) {
         return vec(x + other.x, y + other.y, z + other.z);
     };
 
-    const vec & operator-(const vec &other) {
+    const vec operator-(const vec &other) {
         return vec(x - other.x, y - other.y, z - other.z);
     };
 
-    const vec & operator*(const vec &other) {
+    const vec operator*(const vec &other) {
         return vec(x * other.x, y * other.y, z * other.z);
     };
 };

@@ -46,9 +46,9 @@ public:
     virtual ~Primitive() {};
 
     virtual double intercept(const Ray &ray) = 0;
-    virtual const vec & normalAt(vec &point) = 0;
+    virtual const vec normalAt(vec &point) = 0;
 
-    virtual const vec & colorAt(vec &point) {
+    virtual const vec colorAt(vec & /* point */) {
         return color;
     };
 };
@@ -70,7 +70,7 @@ public:
     };
 
 
-    virtual const vec & normalAt(vec &point) {
+    virtual const vec normalAt(vec &point) {
         vec n = point - pos;
         n.normal();
         return n;
@@ -96,13 +96,13 @@ public:
     };
 
 
-    virtual const vec & normalAt(vec &point) {
+    virtual const vec normalAt(vec & /* point */) {
         return this->normal;
     }
 
-    virtual const vec & colorAt(vec &point) {
-        int a = (abs(int(point.z)) % 2);
-        int b = (abs(int(point.x)) % 2);
+    virtual const vec colorAt(vec &point) {
+        int a = (int(fabs(point.z < 0 ? point.z - 1 : point.z)) % 2);
+        int b = (int(fabs(point.x < 0 ? point.x - 1 : point.x)) % 2);
         if (a == b) {
             return vec(0.6, 0.6, 0.6);
         } else {
@@ -126,20 +126,18 @@ void Canvas::raytrace()
 {
     std::cout << "Start..." << std::endl;
 
-    const int prim_count = 2;
+    const int prim_count = 6;
 
     Primitive *prims[prim_count];
 
-    prims[0] = new Plane(vec(0, -1, 0), vec(0, 1, 0), vec(0, 1, 1));
-    prims[1] = new Sphere(vec(0, 0.5, 0.0), 0.5, vec(1, 0, 0));
-    /*
+    prims[0] = new Plane(vec(0, -1.0, 0), vec(0, 1, 0), vec(0, 1, 1));
+    prims[1] = new Sphere(vec(3.0, 0.0, 8.0), 1.0, vec(1, 0, 0));
     prims[2] = new Sphere(vec(-3,  1, 7),  2, vec(0, 1, 0));
     prims[3] = new Sphere(vec(4,   0, 5),  1, vec(0, 0, 1));
     prims[4] = new Sphere(vec(-4,  0, 3),  1, vec(1, 1, 0));
     prims[5] = new Sphere(vec(1,  -.8, 2),  0.2, vec(1, 0, 1));
-    */
 
-    Light light(vec(1.0, 1.0, 1.0), 15.0);
+    Light light(vec(0.0, 8.0, -1.0), 15.0);
 
     for (int y = 0; y < HEIGHT; y++) {
         for (int x = 0; x < WIDTH; x++) {
@@ -162,9 +160,15 @@ void Canvas::raytrace()
                          1 - (2.0 / HEIGHT) * y, 
                          1));
              */
-            Ray ray(vec(0, 0.5, -5), 
+            /*
+            Ray ray(vec(0, 0, -5), 
                     vec(-0.666 + (1.333 / WIDTH) * x , 
                          0.5 - (1.0 / HEIGHT) * y, 
+                         1));
+                         */
+            Ray ray(vec(0, 6, -8), 
+                    vec(-0.666 + (1.333 / WIDTH) * x , 
+                         0.0 - (1.0 / HEIGHT) * y, 
                          1));
 
             Primitive *prim = 0;
@@ -180,6 +184,7 @@ void Canvas::raytrace()
             if (prim) {
                 // interception point...
                 vec p = ray.dir * length;
+                p = p + ray.pos;
                 vec toLight = light.pos - p;
 
                 // Cast ray from interception point to light source,
@@ -209,22 +214,23 @@ void Canvas::raytrace()
                     // halfway vector...
                     vec tmp =  v + l;
                     vec h   = tmp / tmp.mag();
-                    h.normal();
 
                     tmp = prim->colorAt(p);
-                    tmp = tmp * vec(0.1, 0.1, 0.1);
+                    tmp = tmp * vec(0.2, 0.2, 0.2);
 
-                    double i = max(1.0 - (len / 20.0), 0.0);
+                    double i = max(1.0 - (len / 30.0), 0.0);
                     tmp = tmp * i;
 
                     vec col = tmp * ldexp(max(n.dot(h), 0.0), 3);
 
                     data[x][y] = col;
                 } else {
-                    data[x][y] = vec(0.0, 1.0, 1.0);
+                    vec tmp = prim->colorAt(p);
+                    tmp = tmp * vec(0.1, 0.1, 0.1);
+                    data[x][y] = tmp;
                 }
             } else {
-                data[x][y] = vec(1, 0, 1);
+                data[x][y] = vec(0, 0, 0);
             }
         }
         repaint(0, y, WIDTH, 1);
