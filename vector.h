@@ -11,14 +11,15 @@ public:
     vec() : x(0), y(0), z(0) {};
     vec(double x, double y, double z) : x(x), y(y), z(z) {};
 
-    double mag() { return sqrt(x*x + y*y + z*z); };
-    void normal() {
-        double mag = this->mag();
-        if (mag > 0) {
-            x /= mag;
-            y /= mag;
-            z /= mag;
-        }
+    double mag() const { 
+        return sqrt(x*x + y*y + z*z); 
+    };
+
+    const vec normal() const {
+        double m = this->mag();
+        return m > 0
+             ? vec(x / m, y / m, z / m)
+             : *this;
     };
 
     double dot(const vec &other) const {
@@ -31,23 +32,23 @@ public:
         std::cout << "[" << x << "," << y << "," << z << "]" << std::endl;
     };
 
-    const vec operator*(const double &s) {
+    const vec operator*(const double &s) const {
         return vec(x * s, y * s, z * s);
     };
     
-    const vec operator/(const double &s) {
+    const vec operator/(const double &s) const {
         return vec(x / s, y / s, z / s);
     };
 
-    const vec operator+(const vec &other) {
-        return vec(x + other.x, y + other.y, z + other.z);
+    const vec operator+(const vec &other) const { 
+        return vec(x + other.x, y + other.y, z + other.z); 
     };
 
-    const vec operator-(const vec &other) {
+    const vec operator-(const vec &other) const {
         return vec(x - other.x, y - other.y, z - other.z);
     };
 
-    const vec operator*(const vec &other) {
+    const vec operator*(const vec &other) const {
         return vec(x * other.x, y * other.y, z * other.z);
     };
 };
