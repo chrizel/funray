@@ -115,6 +115,13 @@ public:
     virtual void raytraceLine(Raytracer & /* raytracer */, int /* line */) {};
 };
 
+typedef struct _world {
+  int prim_count;
+  Primitive **prims;
+  Light *light;
+  Camera *camera;
+} World;
+
 class Raytracer
 {
 private:
@@ -135,6 +142,7 @@ public:
     void setListener(RaytraceListener *listener) { this->listener = listener; };
 
     void resetPixels();
+    vec sendRay(World world, Ray ray);
 
     inline int getWidth() { return width; };
     inline int getHeight() { return height; };
