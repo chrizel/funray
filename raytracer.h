@@ -1,6 +1,9 @@
 #ifndef RAYTRACER_H
 #define RAYTRACER_H
 
+#include <iostream>
+using namespace std;
+
 #include "vector.h"
 
 class Camera
@@ -40,9 +43,12 @@ class Primitive
 {
 public:
     vec color;
+    double mirror;
 
     Primitive(const vec &color)
-        : color(color) {};
+      : color(color), mirror(0.0) {};
+    Primitive(const vec &color, double mirror)
+      : color(color), mirror(mirror) {};
     virtual ~Primitive() {};
 
     virtual double intercept(const Ray &ray) = 0;
@@ -51,6 +57,9 @@ public:
     virtual const vec colorAt(vec & /* point */) {
         return color;
     };
+
+    virtual double getMirror() { return mirror; };
+    virtual void setMirror(double mirror) { this->mirror = mirror; };
 };
 
 class Sphere : public Primitive
@@ -63,11 +72,37 @@ public:
     double radius;
 
     virtual double intercept(const Ray &ray) {
-        vec e = pos - ray.pos;
-        double a = e.dot(ray.dir);
-        double f = sqrt(radius * radius - (e.dot(e)) + (a * a));
-        return a - f;
-    };
+      vec e = pos - ray.pos;
+      double a = e.dot(ray.dir);
+      double f = sqrt(radius * radius - (e.dot(e)) + (a * a));
+      return a - f;
+	
+      
+      /*ray.dir.normal();
+      
+      double a = ray.dir.x*ray.dir.x +
+	ray.dir.y*ray.dir.y +
+	ray.dir.z*ray.dir.z;
+      double b = 2*(ray.dir.x*(ray.pos.x - pos.x) +
+	ray.dir.y*(ray.pos.y - pos.y) +
+	ray.dir.z*(ray.pos.z - pos.z));
+      double c = (ray.pos.x-pos.x)*(ray.pos.x-pos.x) +
+	(ray.pos.y-pos.y)*(ray.pos.y-pos.y) +
+	(ray.pos.z-pos.z)*(ray.pos.z-pos.z) - radius*radius;
+      double discr = b*b - 4*c;
+      if (discr < 0.0)
+	return -1.0;
+      double t0 = (-b + sqrt(discr))/2.0;
+      double t1 = (-b - sqrt(discr))/2.0;
+
+      //      cout << t0 << " " << " " << t1 << endl;
+
+      if (t0 <= t1 && t0 > 0.0)
+	return t0;
+      if (t1 > 0.0)
+	return t1;
+	return -1.0;*/
+      };
 
 
     virtual const vec normalAt(vec &point) {
@@ -143,6 +178,7 @@ public:
 
     void resetPixels();
     vec sendRay(World world, Ray ray);
+    vec sendRay(World world, Ray ray, int counter, int doneUse);
 
     inline int getWidth() { return width; };
     inline int getHeight() { return height; };
