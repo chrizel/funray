@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <QList>
 #include <iostream> // DEBUG
 
 #include "vector.h"
@@ -31,37 +32,37 @@ void Raytracer::resetPixels()
 
 vec Raytracer::sendRay(const World world, Ray ray)
 {
-  return sendRay(world, ray, 0, -1);
+  return sendRay(world, ray, 0);
 }
 
-vec Raytracer::sendRay(const World world, Ray ray, int count, int dontUse)
+vec Raytracer::sendRay(const World world, Ray ray, int count)
 {
   int prim_count = world.prim_count;
   Primitive **prims = world.prims;
   Light light = *(world.light);
   Camera camera = *(world.camera);
-  int use = -1;
+  //int use = -1;
 
   if (count > 100) {
     cout << "Infinity mirror..." << endl;
     return vec(0.0, 1.0, 1.0);
   }
-
+  
   Primitive *prim = 0;
   double length  = -1;
   for (int i = 0; i < prim_count; i++) {
-    if (i == dontUse)
-      continue; 
+    /*if (i == dontUse)
+      continue; */
     double len = prims[i]->intercept(ray);
-    if ( (len > 0) && ((length < 0) || (len < length)) ) {
+    if ( (len > 0.0001) && ((length < 0) || (len < length)) ) {
       prim = prims[i];
-      use = i;
+      //  use = i;
       length = len;
     }
   }
   /*if (use == dontUse)
     prim = NULL; */
-
+  
   if (prim) {
     // hit point in world coordinates
     vec p = (ray.dir * length) + ray.pos;
@@ -77,65 +78,56 @@ vec Raytracer::sendRay(const World world, Ray ray, int count, int dontUse)
       if (prims[i] == prim)
 	continue;
       if (prims[i]->intercept(sray) > 0) {
-                        hit = true;
-                        break;
+	hit = true;
+	break;
       }
     }
-
-      // normalized vector from hitpoint to viewer...
-      vec v = (ray.dir * -1).normal();
-      
-      // normalized vector from hitpoint to light...
-      vec l = light.pos - p;
-      double len = l.mag(); // length needed for i below
-      l = l.normal();
-      
-      // normal vector for hitpoint...
-      vec n = prim->normalAt(p).normal();
-      
-      // halfway vector between view and light vector...
-      vec h = (v + l).normal();
-      
-      double i = std::max(1.0 - (len / light.power), 0.0);
-      
-      vec col = prim->colorAt(p)
+    
+    // normalized vector from hitpoint to viewer...
+    vec v = (ray.dir * -1).normal();
+    
+    // normalized vector from hitpoint to light...
+    vec l = light.pos - p;
+    double len = l.mag(); // length needed for i below
+    l = l.normal();
+    
+    // normal vector for hitpoint...
+    vec n = prim->normalAt(p).normal();
+    
+    // halfway vector between view and light vector...
+    vec h = (v + l).normal();
+    
+    double i = std::max(1.0 - (len / light.power), 0.0);
+    
+    vec col;
+    
+    if (hit)
+      col = vec(0,0,0);
+    else
+      col = prim->colorAt(p)
 	* light.color
 	* i
 	* ldexp(std::max(n.dot(h), 0.0), 3);
-    if (!hit) {
-
-      n = n.normal();
+    
+    n = n.normal();
+    
+    if (prim->getMirror() == 0.0) {
+      return col;
+    }
+    else {
+      double x = ray.dir.x;
+      double y = ray.dir.y;
+      double z = ray.dir.z;
       
-      if (prim->getMirror() == 0.0) {
-	return col;
-      }
-      else {
-	double x = ray.dir.x;
-	double y = ray.dir.y;
-	double z = ray.dir.z;
-	vec mirrorRayTo((x*(1-2*n.x*n.x) +   -2*y*n.x*n.y +     -2*z*n.x*n.z),
-			(-2*x*n.y*n.x +       y*(1-2*n.y*n.y) + -2*z*n.y*n.z),
-			(-2*x*n.z*n.x +       -2*y*n.z*n.y +     z*(1-2*n.z*n.z)));
-
-	return 
-	  sendRay(world, Ray(p, mirrorRayTo), count+1, use)*prim->getMirror()+
-	  col*(1.0-prim->getMirror());
-	  
-      }
-    } else {
-      if (prim->getMirror() == 0.0) {
-	return prim->colorAt(p) * vec(0.0, 0.0, 0.0);
-      }
-      else {
-	vec mirrorRayTo((1 - 2*(n.x*n.x + n.x*n.y + n.x*n.z))* ray.dir.x,
-			(1 - 2*(n.y*n.x + n.y*n.y + n.y*n.z))* ray.dir.y,
-			(1 - 2*(n.z*n.x + n.z*n.y + n.z*n.z))* ray.dir.z);
-	
-	return 
-	  sendRay(world, Ray(p, mirrorRayTo), count+1, use)*prim->getMirror();
-	  //prim->colorAt(p)*(1.0-prim->getMirror()) * vec(0.1, 0.1, 0.1);
-	  
-      }
+      ray.dir = ray.dir.normal();
+      
+      vec mirrorRayTo((x*(1-2*n.x*n.x) +   -2*y*n.x*n.y +     -2*z*n.x*n.z),
+		      (-2*x*n.y*n.x +       y*(1-2*n.y*n.y) + -2*z*n.y*n.z),
+		      (-2*x*n.z*n.x +       -2*y*n.z*n.y +     z*(1-2*n.z*n.z)));
+      
+      return 
+	sendRay(world, Ray(p, mirrorRayTo), count+1)*prim->getMirror()+
+	col*(1.0-prim->getMirror());
     }
   } else {
     return vec(0, 0, 0);
