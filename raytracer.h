@@ -23,17 +23,8 @@ using namespace std;
 
 #include "vector.h"
 
-class Camera
-{
-public:
-    Camera(const vec &pos, const vec &dir, double hlen, double vlen)
-        : pos(pos), dir(dir), hlen(hlen), vlen(vlen) {};
-
-    vec pos;
-    vec dir;
-    double hlen;
-    double vlen;
-};
+class Raytracer;
+class Camera;
 
 class Ray
 {
@@ -130,8 +121,6 @@ public:
     };
 };
 
-class Raytracer;
-
 class RaytraceListener
 {
 public:
@@ -178,5 +167,44 @@ public:
         return pixels[width * y + x];
     };
 };
+
+class Camera
+{
+private:
+    Raytracer &rt;
+
+public:
+    Camera(Raytracer &rt, 
+           const vec &pos, 
+           const vec &dir, 
+           double hlen, 
+           double vlen)
+        : rt(rt),
+          pos(pos), 
+          dir(dir.normal()), 
+          hlen(hlen), 
+          vlen(vlen) {};
+
+    vec pos;
+    vec dir;
+    double hlen;
+    double vlen;
+
+    const vec dirVecFor(int x, int y) {
+        vec v = vec(-(hlen / 2) + (hlen / rt.getWidth())  * x,
+                     (vlen / 2) - (vlen / rt.getHeight()) * y,
+                     1).normal();
+        vec d = vec(0, 0, 1).normal();
+
+        vec k = d - v;
+
+        //return (dir + diff).normal(); 
+        //return dir - view;
+        return v;
+        vec n = dir - k;
+        return n;
+    };
+};
+
 
 #endif
