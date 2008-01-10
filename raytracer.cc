@@ -169,12 +169,9 @@ void Raytracer::raytrace()
     prims[4]->setMirror(.8);
     prims[5] = new Sphere(vec(1,  -.8, 2),  1, vec(1, 0, 1));
     prims[5]->setMirror(.8);
-    //prims[6] = new Plane(vec(6, 0, 0), vec(-1, 0, 0), vec(0, 1, 1));
 
     Light light(vec(0.0, 8.0, -1.0), vec(0.2, 0.2, 0.2), 30.0);
     Camera camera(*this, vec(0, 6, -8), vec(0, -1, 1), 1.333, 1.0);
-    //Camera camera(vec(0, 1, -8), vec(0, 1, 1), 1.333, 1.0);
-    
 
     World world;
     world.prim_count = prim_count;

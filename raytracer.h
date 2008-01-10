@@ -194,15 +194,7 @@ public:
         vec v = vec(-(hlen / 2) + (hlen / rt.getWidth())  * x,
                      (vlen / 2) - (vlen / rt.getHeight()) * y,
                      1).normal();
-        vec d = vec(0, 0, 1).normal();
-
-        vec k = d - v;
-
-        //return (dir + diff).normal(); 
-        //return dir - view;
         return v;
-        vec n = dir - k;
-        return n;
     };
 };
 
