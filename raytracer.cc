@@ -19,6 +19,7 @@
 #include <iostream> // DEBUG
 
 #include "camera.h"
+#include "primitives.h"
 #include "raytracer.h"
 #include "vector.h"
 
