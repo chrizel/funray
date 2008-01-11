@@ -16,7 +16,6 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, see <http://www.gnu.org/licenses/>. */
 
 #include <QApplication>
-#include <QPushButton>
 #include <QWidget>
 #include <QVBoxLayout>
 
@@ -25,18 +24,10 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    QWidget window;
+    Canvas canvas;
 
-    Canvas *canvas = new Canvas();
-    QPushButton *button = new QPushButton("Render");
+    canvas.show();
+    canvas.render();
 
-    QObject::connect(button, SIGNAL(clicked()), canvas, SLOT(render()));
-
-    QVBoxLayout vbox;
-    vbox.addWidget(button);
-    vbox.addWidget(canvas);
-
-    window.setLayout(&vbox);
-    window.show();
     return app.exec();
 }
