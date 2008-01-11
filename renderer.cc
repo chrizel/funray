@@ -15,11 +15,22 @@
   You should have received a copy of the GNU General Public License along 
   with this program; if not, see <http://www.gnu.org/licenses/>. */
 
+#include <QThread>
+
+#include <iostream>
 #include <vector>
+#include <unistd.h>
 
 #include "renderer.h"
 #include "vector.h"
 
+
+Worker::Worker(Renderer &renderer, int from, int step) 
+    : renderer(renderer),
+      from(from),
+      step(step)
+{
+}
 
 Renderer::Renderer(const Scene &scene, int width, int height)
     : scene(scene), width(width), height(height), listener(0)
@@ -43,23 +54,60 @@ void Renderer::resetPixels()
     }
 }
 
+void Worker::run()
+{
+    std::cout << "Thread " << from << " started." << std::endl;
+
+    const Scene &scene = renderer.getScene();
+    int width = renderer.getWidth();
+    int height = renderer.getHeight();
+
+    for (int y = from; y < height; y += step) {
+	for (int x = 0; x < width; x++) {
+	    Ray ray(scene.camera.pos, scene.camera.dirVecFor(x, y, width, height));
+	    renderer.setPixel(x, y, scene.sendRay(ray));
+	}
+    }
+
+    std::cout << "Thread " << from << " finished." << std::endl;
+}
+
 void Renderer::render()
 {
     resetPixels();
     if (listener) listener->renderStart(*this);
 
-    const int cycles = 4;
-    for (int g = 0; g < cycles; g++) {
-	for (int y = g; y < height; y += cycles) {
-	    for (int x = 0; x < width; x++) {
-		Ray ray(scene.camera.pos, scene.camera.dirVecFor(x, y, width, height));
-		setPixel(x, y, scene.sendRay(ray));
-	    }
+    const int thread_count = 3;
 
-	    if (listener) listener->renderLine(*this, y);
-	}
+    Worker **workers = new Worker*[thread_count];
+
+    for (int t = 0; t < thread_count; t++) {
+	Worker *worker = new Worker(*this, t + 1, thread_count + 1);
+	worker->start();
+	workers[t] = worker;
     }
 
+    for (int y = 0; y < height; y += thread_count + 1) {
+	for (int x = 0; x < width; x++) {
+	    Ray ray(scene.camera.pos, scene.camera.dirVecFor(x, y, width, height));
+	    setPixel(x, y, scene.sendRay(ray));
+	}
+	if (listener) listener->renderLine(*this, y);
+    }
+
+
+    int count = thread_count;
+    while (count) {
+	for (int t = 0; t < thread_count; t++) {
+	    if (workers[t] && workers[t]->isFinished()) {
+		delete workers[t];
+		workers[t] = 0;
+		count--;
+	    }
+	}
+
+	usleep(200);
+    }
 
     if (listener) listener->renderEnd(*this);
 }

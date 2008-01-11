@@ -18,6 +18,9 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <QList>
+#include <QThread>
+
 #include <cmath>
 
 #include "scene.h"
@@ -33,6 +36,18 @@ public:
     virtual void renderLine(Renderer & /* renderer */, int /* line */) {};
 };
 
+class Worker : public QThread 
+{
+  private:
+    Renderer &renderer;
+    int from;
+    int step;
+
+  public:
+    Worker(Renderer &renderer, int from, int step);
+    void run();
+};
+
 class Renderer
 {
 private:
@@ -43,11 +58,9 @@ private:
 
     vec *pixels;
     void resetPixels();
-    inline void setPixel(const int &x, const int &y, const vec &d) {
-        pixels[width * y + x] = d.clamp();
-    };
 
 public:
+
 
     Renderer(const Scene &scene, int width, int height);
     virtual ~Renderer();
@@ -56,6 +69,9 @@ public:
 
     inline const vec getPixel(int x, int y) const {
         return pixels[width * y + x];
+    };
+    inline void setPixel(const int &x, const int &y, const vec &d) {
+        pixels[width * y + x] = d.clamp();
     };
 
     void setListener(RendererListener *listener) { 
@@ -68,6 +84,9 @@ public:
     inline int getHeight() { 
 	return height; 
     };
+    inline const Scene & getScene() {
+	return scene;
+    }
 };
 
 #endif
