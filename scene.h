@@ -15,26 +15,32 @@
   You should have received a copy of the GNU General Public License along 
   with this program; if not, see <http://www.gnu.org/licenses/>. */
 
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef SCENE_H
+#define SCENE_H
 
+#include <vector>
+
+#include "camera.h"
+#include "light.h"
 #include "vector.h"
 
-class Camera
+class Primitive;
+class Ray;
+
+typedef std::vector<Primitive*> Prims;
+typedef Prims::const_iterator PrimsIterator;
+
+class Scene
 {
 public:
-    Camera(const vec &pos,
-           const vec &dir, 
-           double hlen, 
-           double vlen);
-    virtual ~Camera();
+    Prims prims;
+    Light light;
+    Camera camera;
 
-    vec pos;
-    vec dir;
-    double hlen;
-    double vlen;
+    Scene();
+    virtual ~Scene();
 
-    const vec dirVecFor(int x, int y, int width, int height) const;
+    vec sendRay(Ray ray, int counter = 0) const;
 };
 
 #endif

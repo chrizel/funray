@@ -15,26 +15,18 @@
   You should have received a copy of the GNU General Public License along 
   with this program; if not, see <http://www.gnu.org/licenses/>. */
 
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef LIGHT_H
+#define LIGHT_H
 
-#include "vector.h"
-
-class Camera
+class Light
 {
 public:
-    Camera(const vec &pos,
-           const vec &dir, 
-           double hlen, 
-           double vlen);
-    virtual ~Camera();
+    Light(const vec &pos, const vec &color, const double power)
+        : pos(pos), color(color), power(power) {};
 
     vec pos;
-    vec dir;
-    double hlen;
-    double vlen;
-
-    const vec dirVecFor(int x, int y, int width, int height) const;
+    vec color;
+    double power;
 };
 
 #endif

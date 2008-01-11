@@ -26,27 +26,28 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 
 #include "canvas.h"
 #include "vector.h"
-#include "raytracer.h"
+#include "renderer.h"
 
 Canvas::Canvas(QWidget *parent)
     : QWidget(parent),
-      raytracer(640, 480)
+      scene(),
+      renderer(scene, 640, 480)
 {
-    raytracer.setListener(this);
-    setMinimumSize(raytracer.getWidth(), raytracer.getHeight());
-    setMaximumSize(raytracer.getWidth(), raytracer.getHeight());
+    renderer.setListener(this);
+    setMinimumSize(renderer.getWidth(), renderer.getHeight());
+    setMaximumSize(renderer.getWidth(), renderer.getHeight());
 }
 
 Canvas::~Canvas()
 {
 }
 
-void Canvas::raytrace()
+void Canvas::render()
 {
     std::cout << "Start..." << std::endl;
     QTime t;
     t.start();
-    raytracer.raytrace();
+    renderer.render();
     std::cout << "Finished in " << t.elapsed() << " ms." << std::endl;
 }
 
@@ -60,7 +61,7 @@ void Canvas::paintEvent(QPaintEvent *event)
         x2 = x1 + rect.width();
     for (int y = y1; y < y2; y++) {
         for (int x = x1; x < x2; x++) {
-            const vec & pixel = raytracer.getPixel(x, y);
+            const vec & pixel = renderer.getPixel(x, y);
             painter.setPen(QColor((int)(pixel.x * 255), 
                                   (int)(pixel.y * 255), 
                                   (int)(pixel.z * 255)));

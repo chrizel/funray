@@ -83,4 +83,14 @@ inline vec xproduct(const vec &a, const vec &b)
 	       a.x * b.y - a.y * b.x);
 }
 
+class Ray
+{
+public:
+    Ray(const vec &pos, const vec &dir)
+        : pos(pos), dir(dir.normal()) {};
+
+    vec pos;
+    vec dir;
+};
+
 #endif

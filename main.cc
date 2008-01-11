@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     Canvas *canvas = new Canvas();
     QPushButton *button = new QPushButton("Render");
 
-    QObject::connect(button, SIGNAL(clicked()), canvas, SLOT(raytrace()));
+    QObject::connect(button, SIGNAL(clicked()), canvas, SLOT(render()));
 
     QVBoxLayout vbox;
     vbox.addWidget(button);

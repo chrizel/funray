@@ -20,14 +20,16 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 
 #include <QWidget>
 
-#include "raytracer.h"
+#include "scene.h"
+#include "renderer.h"
 
-class Canvas : public QWidget, public RaytraceListener
+class Canvas : public QWidget, public RendererListener
 {
     Q_OBJECT
 
 private:
-    Raytracer raytracer;
+    Scene scene;
+    Renderer renderer;
 
 public:
     Canvas(QWidget *parent = 0);
@@ -35,20 +37,20 @@ public:
 
     virtual void paintEvent(QPaintEvent *event);
 
-    virtual void raytraceStart(Raytracer & /* raytracer */) {
-        repaint();
+    virtual void renderStart(Renderer & /* renderer */) {
+	repaint();
     };
 
-    virtual void raytraceEnd(Raytracer & /* raytracer */) {
-        repaint();
+    virtual void renderEnd(Renderer & /* renderer */) {
+	repaint();
     };
 
-    virtual void raytraceLine(Raytracer &  raytracer, int line) {
-        repaint(0, line, raytracer.getWidth(), 1);
+    virtual void renderLine(Renderer &  renderer, int line) {
+	repaint(0, line, renderer.getWidth(), 1);
     };
 
 public slots:
-    void raytrace();
+    void render();
 };
 
 #endif

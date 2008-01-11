@@ -15,23 +15,18 @@
   You should have received a copy of the GNU General Public License along 
   with this program; if not, see <http://www.gnu.org/licenses/>. */
 
-#include <algorithm>
-#include <iostream> // DEBUG
+#include <vector>
 
 #include "camera.h"
+#include "light.h"
 #include "primitives.h"
-#include "raytracer.h"
+#include "scene.h"
 #include "vector.h"
 
-Raytracer::Raytracer(int width, int height)
-    : width(width), height(height), listener(0),
-      light(vec(0.0, 8.0, -1.0), vec(0.2, 0.2, 0.2), 30.0),
-      camera(*this, vec(0, 0, -10), vec(0.0, 0.0, 1.0), 1.333, 1.0)
-
+Scene::Scene()
+    : light(vec(0.0, 8.0, -1.0), vec(0.2, 0.2, 0.2), 30.0),
+      camera(vec(0, 0, -10), vec(0.0, 0.0, 1.0), 1.333, 1.0)
 {
-    pixels = new vec[width * height];
-    resetPixels();
-
     prims.push_back(new Plane(vec(0, -1.0, 0), vec(0, 1, 0), vec(0, 1, 1)));
     prims.push_back(new Sphere(vec(0.0, 0.0, 3.0), 1.0, vec(1, 1, 1)));
     prims.push_back(new Sphere(vec(2.0, 0.0, 2.0), 1.0, vec(1, 1, 1)));
@@ -40,22 +35,13 @@ Raytracer::Raytracer(int width, int height)
     prims.push_back(new Sphere(vec(1,  -0.8, 2),  0.2, vec(1, 0, 1)));
 }
 
-Raytracer::~Raytracer()
+Scene::~Scene()
 {
     for (PrimsIterator it = prims.begin(); it != prims.end(); it++)
 	delete *it;
 }
 
-void Raytracer::resetPixels()
-{
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            setPixel(x, y, vec(1, 1, 1));
-        }
-    }
-}
-
-vec Raytracer::sendRay(Ray ray, int count)
+vec Scene::sendRay(Ray ray, int count) const
 {
     if (count > 100) {
 	std::cout << "Infinity mirror..." << std::endl;
@@ -144,24 +130,4 @@ vec Raytracer::sendRay(Ray ray, int count)
 	double fac = q.y / 20.0;
 	return vec(1.0 - (0.4 * fac), 1.0 - (0.2 * fac), 1.0);
     }
-}
-
-void Raytracer::raytrace()
-{
-    resetPixels();
-    if (listener) listener->raytraceStart(*this);
-
-    const int cycles = 4;
-    for (int g = 0; g < cycles; g++) {
-	for (int y = g; y < height; y += cycles) {
-	    for (int x = 0; x < width; x++) {
-		Ray ray(camera.pos, camera.dirVecFor(x, y), x, y);
-		setPixel(x, y, sendRay(ray));
-	    }
-
-	    if (listener) listener->raytraceLine(*this, y);
-	}
-    }
-
-    if (listener) listener->raytraceEnd(*this);
 }
