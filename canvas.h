@@ -36,6 +36,7 @@ public:
     virtual ~Canvas();
 
     virtual void paintEvent(QPaintEvent *event);
+    virtual void keyPressEvent(QKeyEvent *event);
 
     virtual void renderStart(Renderer & /* renderer */) {
 	repaint();

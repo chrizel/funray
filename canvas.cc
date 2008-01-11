@@ -69,3 +69,13 @@ void Canvas::paintEvent(QPaintEvent *event)
         }
     }
 }
+
+void Canvas::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+	close();
+    else if ((event->key() == Qt::Key_R && event->modifiers() == Qt::ControlModifier)
+	     || (event->key() == Qt::Key_F5)
+	     || (event->key() == Qt::Key_Return))
+	render();
+}
