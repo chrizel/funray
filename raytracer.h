@@ -19,13 +19,10 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 #define RAYTRACER_H
 
 #include <cmath>
-#include <iostream>
-using namespace std;
+#include <vector>
 
+#include "camera.h"
 #include "vector.h"
-
-class Raytracer;
-class Camera;
 
 class Ray
 {
@@ -56,10 +53,8 @@ public:
     vec color;
     double mirror;
 
-    Primitive(const vec &color)
-      : color(color), mirror(0.0) {};
-    Primitive(const vec &color, double mirror)
-      : color(color), mirror(mirror) {};
+    Primitive(const vec &color, double mirror = 0.5)
+	: color(color), mirror(mirror) {};
     virtual ~Primitive() {};
 
     virtual double intercept(const Ray &ray) = 0;
@@ -91,7 +86,15 @@ public:
 
 
     virtual const vec normalAt(vec &point) {
-      return (point - pos).normal();
+	/*
+	vec v = (point - pos).normal(); 
+	double r1 = 0.1 * (rand() % 100) / 100.0; 
+	double r2 = 0.1 * (rand() % 100) / 100.0;
+	double r3 = 0.1 * (rand() % 100) / 100.0;
+	return (v + vec(r1, r2, r3)).normal();
+	*/
+
+	return (point - pos).normal();
     }
 };
 
@@ -124,6 +127,7 @@ public:
     };
 };
 
+
 class RaytraceListener
 {
 public:
@@ -133,25 +137,25 @@ public:
     virtual void raytraceLine(Raytracer & /* raytracer */, int /* line */) {};
 };
 
-typedef struct _world {
-  int prim_count;
-  Primitive **prims;
-  Light *light;
-  Camera *camera;
-} World;
-
 class Raytracer
 {
 private:
     vec *pixels;
     int width;
     int height;
+
     RaytraceListener *listener;
+
+    typedef std::vector<Primitive*> Prims;
+    typedef Prims::iterator PrimsIterator;
+    Prims prims;
+    
+    Light light;
+    Camera camera;
 
     inline void setPixel(const int &x, const int &y, const vec &d) {
         pixels[width * y + x] = d.clamp();
     };
-
 public:
     Raytracer(int width, int height);
     virtual ~Raytracer();
@@ -160,8 +164,7 @@ public:
     void setListener(RaytraceListener *listener) { this->listener = listener; };
 
     void resetPixels();
-    vec sendRay(World world, Ray ray);
-    vec sendRay(World world, Ray ray, int counter);
+    vec sendRay(Ray ray, int counter = 0);
 
     inline int getWidth() { return width; };
     inline int getHeight() { return height; };
@@ -171,59 +174,6 @@ public:
     };
 };
 
-class Camera
-{
-private:
-    Raytracer &rt;
-
-public:
-    Camera(Raytracer &rt, 
-           const vec &pos, 
-           const vec &dir, 
-           double hlen, 
-           double vlen)
-        : rt(rt),
-          pos(pos), 
-          dir(dir.normal()), 
-          hlen(hlen), 
-          vlen(vlen) {};
-
-    vec pos;
-    vec dir;
-    double hlen;
-    double vlen;
-
-    const vec dirVecFor(int x, int y) {
-        vec v = vec(-(hlen / 2) + (hlen / rt.getWidth())  * x,
-                     (vlen / 2) - (vlen / rt.getHeight()) * y,
-                     1.333).normal();
-
-	vec a = vec(0, 0, 1);
-	vec b = dir;
-
-	// angle between vector a and b:
-	double ct = a.dot(b) / (a.mag() + b.mag());
-	double st = sin(acos(ct));
-
-	// calculate perpendicular vector from a and b
-	vec n = xproduct(a, b).normal();
-
-	// multiply vector v with rotation matrix
-	vec r = vec( v.x * (n.x * n.x * (1 - ct) + ct) +
-		     v.y * (n.x * n.y * (1 - ct) - n.z * st) +
-		     v.z * (n.x * n.z * (1 - ct) + n.y * st),
-
-		     v.x * (n.x * n.y * (1 - ct) + n.z * st) +
-		     v.y * (n.y * n.y * (1 - ct) + ct) +
-		     v.z * (n.y * n.z * (1 - ct) - n.x * st),
-
-		     v.x * (n.x * n.z * (1 - ct) - n.y * st) +
-		     v.y * (n.y * n.z * (1 - ct) + n.x * st) +
-		     v.z * (n.z * n.z * (1 - ct) + ct) );
-
-        return r;
-    };
-};
 
 
 #endif

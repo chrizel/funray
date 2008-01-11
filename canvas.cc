@@ -18,9 +18,11 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 #include <iostream>
 
 #include <QApplication>
-#include <QWidget>
 #include <QPainter>
 #include <QPaintEvent>
+#include <QTime>
+#include <QWidget>
+
 
 #include "canvas.h"
 #include "vector.h"
@@ -28,7 +30,7 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 
 Canvas::Canvas(QWidget *parent)
     : QWidget(parent),
-      raytracer(800, 600)
+      raytracer(640, 480)
 {
     raytracer.setListener(this);
     setMinimumSize(raytracer.getWidth(), raytracer.getHeight());
@@ -42,8 +44,10 @@ Canvas::~Canvas()
 void Canvas::raytrace()
 {
     std::cout << "Start..." << std::endl;
+    QTime t;
+    t.start();
     raytracer.raytrace();
-    std::cout << "Finished!" << std::endl;
+    std::cout << "Finished in " << t.elapsed() << " ms." << std::endl;
 }
 
 void Canvas::paintEvent(QPaintEvent *event)

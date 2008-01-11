@@ -16,24 +16,33 @@
   with this program; if not, see <http://www.gnu.org/licenses/>. */
 
 #include <algorithm>
-#include <QList>
 #include <iostream> // DEBUG
 
-#include "vector.h"
+#include "camera.h"
 #include "raytracer.h"
-
-using namespace std; // DEBUG
+#include "vector.h"
 
 Raytracer::Raytracer(int width, int height)
-    : width(width), height(height), listener(0)
+    : width(width), height(height), listener(0),
+      light(vec(0.0, 8.0, -1.0), vec(0.2, 0.2, 0.2), 30.0),
+      camera(*this, vec(0, 0, -10), vec(0.0, 0.0, 1.0), 1.333, 1.0)
+
 {
     pixels = new vec[width * height];
     resetPixels();
+
+    prims.push_back(new Plane(vec(0, -1.0, 0), vec(0, 1, 0), vec(0, 1, 1)));
+    prims.push_back(new Sphere(vec(0.0, 0.0, 3.0), 1.0, vec(1, 1, 1)));
+    prims.push_back(new Sphere(vec(2.0, 0.0, 2.0), 1.0, vec(1, 1, 1)));
+    prims.push_back(new Sphere(vec(4,   0, 5),  1, vec(0, 0, 1)));
+    prims.push_back(new Sphere(vec(-4,  0, 3),  1, vec(1, 1, 0)));
+    prims.push_back(new Sphere(vec(1,  -0.8, 2),  0.2, vec(1, 0, 1)));
 }
 
 Raytracer::~Raytracer()
 {
-    delete [] pixels;
+    for (PrimsIterator it = prims.begin(); it != prims.end(); it++)
+	delete *it;
 }
 
 void Raytracer::resetPixels()
@@ -45,29 +54,19 @@ void Raytracer::resetPixels()
     }
 }
 
-vec Raytracer::sendRay(const World world, Ray ray)
+vec Raytracer::sendRay(Ray ray, int count)
 {
-    return sendRay(world, ray, 0);
-}
-
-vec Raytracer::sendRay(const World world, Ray ray, int count)
-{
-    int prim_count = world.prim_count;
-    Primitive **prims = world.prims;
-    Light light = *(world.light);
-    Camera camera = *(world.camera);
-
     if (count > 100) {
-	cout << "Infinity mirror..." << endl;
+	std::cout << "Infinity mirror..." << std::endl;
 	return vec(0.0, 1.0, 1.0);
     }
   
     Primitive *prim = 0;
     double length  = -1;
-    for (int i = 0; i < prim_count; i++) {
-	double len = prims[i]->intercept(ray);
+    for (PrimsIterator it = prims.begin(); it != prims.end(); it++) {
+	double len = (*it)->intercept(ray);
 	if ( (len > 0.0001) && ((length < 0) || (len < length)) ) {
-	    prim = prims[i];
+	    prim = *it;
 	    length = len;
 	}
     }
@@ -83,10 +82,10 @@ vec Raytracer::sendRay(const World world, Ray ray, int count)
 	// and check if object is between them...
 	Ray sray(p, toLight);
 	bool hit = false;
-	for (int i = 0; i < prim_count; i++) {
-	    if (prims[i] == prim)
-		continue;
-	    if (prims[i]->intercept(sray) > 0) {
+	for (PrimsIterator it = prims.begin(); it != prims.end(); it++) {
+	    if (*it == prim)
+		break;
+	    if ((*it)->intercept(sray) > 0) {
 		hit = true;
 		break;
 	    }
@@ -130,12 +129,12 @@ vec Raytracer::sendRay(const World world, Ray ray, int count)
       
 	    ray.dir = ray.dir.normal();
       
-	    vec mirrorRayTo((x*(1-2*n.x*n.x) +   -2*y*n.x*n.y +     -2*z*n.x*n.z),
-			    (-2*x*n.y*n.x +       y*(1-2*n.y*n.y) + -2*z*n.y*n.z),
-			    (-2*x*n.z*n.x +       -2*y*n.z*n.y +     z*(1-2*n.z*n.z)));
+	    vec mirrorRayTo((x*(1-2*n.x*n.x) + -2*y*n.x*n.y     + -2*z*n.x*n.z),
+			    (-2*x*n.y*n.x +  y*(1-2*n.y*n.y) + -2*z*n.y*n.z),
+			    (-2*x*n.z*n.x + -2*y*n.z*n.y    + z*(1-2*n.z*n.z)));
       
 	    return 
-		sendRay(world, Ray(p, mirrorRayTo), count+1)*prim->getMirror()+
+		sendRay(Ray(p, mirrorRayTo), count+1)*prim->getMirror()+
 		col*(1.0-prim->getMirror());
 	}
     } else {
@@ -148,31 +147,6 @@ vec Raytracer::sendRay(const World world, Ray ray, int count)
 
 void Raytracer::raytrace()
 {
-    const int prim_count = 6;
-    Primitive *prims[prim_count];
-
-    prims[0] = new Plane(vec(0, -1.0, 0), vec(0, 1, 0), vec(0, 1, 1));
-    prims[0]->setMirror(.2);
-    prims[1] = new Sphere(vec(3.0, 0.0, 8.0), 1.0, vec(1, 0, 0));
-    prims[1]->setMirror(.8);
-    prims[2] = new Sphere(vec(-3,  1, 7),  2, vec(0, 1, 0));
-    prims[2]->setMirror(.99);
-    prims[3] = new Sphere(vec(4,   0, 5),  1, vec(0, 0, 1));
-    prims[3]->setMirror(.8);
-    prims[4] = new Sphere(vec(-4,  0, 3),  1, vec(1, 1, 0));
-    prims[4]->setMirror(.8);
-    prims[5] = new Sphere(vec(1,  -0.8, 2),  0.2, vec(1, 0, 1));
-    prims[5]->setMirror(.8);
-
-    Light light(vec(0.0, 8.0, -1.0), vec(0.2, 0.2, 0.2), 30.0);
-    Camera camera(*this, vec(0, 0, -10), vec(0, 0, 1), 1.333, 1.0);
-
-    World world;
-    world.prim_count = prim_count;
-    world.prims = prims;
-    world.light = &light;
-    world.camera = &camera;
-
     resetPixels();
     if (listener) listener->raytraceStart(*this);
 
@@ -181,7 +155,7 @@ void Raytracer::raytrace()
 	for (int y = g; y < height; y += cycles) {
 	    for (int x = 0; x < width; x++) {
 		Ray ray(camera.pos, camera.dirVecFor(x, y), x, y);
-		setPixel(x, y, sendRay(world, ray));
+		setPixel(x, y, sendRay(ray));
 	    }
 
 	    if (listener) listener->raytraceLine(*this, y);
@@ -189,8 +163,4 @@ void Raytracer::raytrace()
     }
 
     if (listener) listener->raytraceEnd(*this);
-
-    for (int i = 0; i < prim_count; i++) {
-        delete prims[i];
-    }
 }

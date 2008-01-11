@@ -9,5 +9,5 @@ INCLUDEPATH += .
 CONFIG += DEBUG
 
 # Input
-HEADERS += canvas.h vector.h raytracer.h
-SOURCES += canvas.cc main.cc raytracer.cc
+HEADERS += canvas.h vector.h raytracer.h camera.h
+SOURCES += canvas.cc main.cc raytracer.cc camera.cc
