@@ -52,6 +52,7 @@ public:
 
 public slots:
     void render();
+    void save();
 };
 
 #endif
