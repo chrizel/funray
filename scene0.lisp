@@ -1,15 +1,11 @@
 (scene
 
  (camera
-  (position 0 0 -5))
+  (position 0 0 -5)
+  (direction 0 0 1))
 
  (light
   (position 0 8 -1)
-  (color .2 .2 .2)
-  (power 30))
-
- (light
-  (position 5 8 0)
   (color .2 .2 .2)
   (power 30))
 

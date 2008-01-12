@@ -44,7 +44,7 @@ const vec Camera::dirVecFor(int x, int y, int width, int height) const {
     vec b = dir;
 
     // angle between vector a and b:
-    double ct = a.dot(b) / (a.mag() + b.mag());
+    double ct = a.dot(b);
     double st = sin(acos(ct));
 
     // calculate perpendicular vector from a and b
