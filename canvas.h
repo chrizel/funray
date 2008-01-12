@@ -19,6 +19,7 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 #define CANVAS_H
 
 #include <QWidget>
+#include <QFileSystemWatcher>
 
 #include "scene.h"
 #include "renderer.h"
@@ -28,8 +29,12 @@ class Canvas : public QWidget, public RendererListener
     Q_OBJECT
 
 private:
+    QFileSystemWatcher watcher;
+
     Scene *scene;
     Renderer *renderer;
+
+    QString fileName;
 
 public:
     Canvas(QWidget *parent = 0);
@@ -50,9 +55,15 @@ public:
 	repaint(0, line, renderer.getWidth(), 1);
     };
 
+    bool loadScene(const QString &fileName);
+    void setAutoRefresh(bool value);
+
 public slots:
     void render();
     void save();
+
+private slots:
+    void fileChanged(const QString &path);
 };
 
 #endif

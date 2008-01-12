@@ -15,6 +15,8 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along 
 with this program; if not, see <http://www.gnu.org/licenses/>. */
 
+#include <iostream>
+
 #include <QApplication>
 #include <QDebug>
 #include <QWidget>
@@ -29,8 +31,17 @@ int main(int argc, char ** argv)
     QApplication app(argc, argv);
     Canvas canvas;
 
-    canvas.show();
-    canvas.render();
+    if (argc > 1) {
+	if (canvas.loadScene(argv[1])) {
+	    if ((argc > 2) && QString(argv[2]) == "--autorefresh")
+		canvas.setAutoRefresh(true);
+	    canvas.show();
+	    canvas.render();
+	    return app.exec();
+	}
+    } else {
+	std::cout << "Usage: " << argv[0] << " scene-file [--autorefresh]" << std::endl;
+    }
 
-    return app.exec();
+    return 0;
 }
