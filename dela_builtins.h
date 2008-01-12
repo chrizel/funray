@@ -1,5 +1,5 @@
 /*funray - yet another raytracer
-Copyright (C) 2008  Christian Zeller (chrizel@gmail.com) and
+opyright (C) 2008  Christian Zeller (chrizel@gmail.com) and
                     Simon Goller (neosam@gmail.com).
 
 This program is free software; you can redistribute it and/or modify 
@@ -15,22 +15,18 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along 
 with this program; if not, see <http://www.gnu.org/licenses/>. */
 
-#include <QApplication>
-#include <QDebug>
-#include <QWidget>
-#include <QVBoxLayout>
+#ifndef DELA_BUILTINS_H
+#define DELA_BUILTINS_H
 
-#include "canvas.h"
-#include "dela.h"
-#include "dela_builtins.h"
+namespace dela {
 
-int main(int argc, char ** argv)
-{
-    QApplication app(argc, argv);
-    Canvas canvas;
+    class Engine;    
+    class Scriptable;
+    class List;
 
-    canvas.show();
-    canvas.render();
+    void addBuiltins(Engine *e);
+    Scriptable *begin(Engine *e, List *params);
 
-    return app.exec();
 }
+
+#endif

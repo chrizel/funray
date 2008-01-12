@@ -28,6 +28,9 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 #include "vector.h"
 #include "renderer.h"
 
+#include "dela.h"
+#include "dela_glue.h"
+
 static void drawRendering(QPainter &painter, Renderer &renderer,
 			  int y1, int y2, int x1, int x2)
 {
@@ -43,17 +46,23 @@ static void drawRendering(QPainter &painter, Renderer &renderer,
 }
 
 Canvas::Canvas(QWidget *parent)
-    : QWidget(parent),
-      scene(),
-      renderer(scene, 640, 480)
+    : QWidget(parent)
 {
-    renderer.setListener(this);
-    setMinimumSize(renderer.getWidth(), renderer.getHeight());
-    setMaximumSize(renderer.getWidth(), renderer.getHeight());
+    dela::Engine e;
+    addDelaGlue(&e);
+
+    scene = dela::ensureType<Scene>(e.evalFile("scene0.lisp", true));
+    renderer = new Renderer(*scene, 640, 480);
+
+    renderer->setListener(this);
+    setMinimumSize(renderer->getWidth(), renderer->getHeight());
+    setMaximumSize(renderer->getWidth(), renderer->getHeight());
 }
 
 Canvas::~Canvas()
 {
+    delete renderer;
+    delete scene;
 }
 
 void Canvas::render()
@@ -61,7 +70,7 @@ void Canvas::render()
     std::cout << "Start..." << std::endl;
     QTime t;
     t.start();
-    renderer.render();
+    renderer->render();
     std::cout << "Finished in " << t.elapsed() << " ms." << std::endl;
 }
 
@@ -70,9 +79,9 @@ void Canvas::save()
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
 						    "", tr("Images (*.png)"));
     if (!fileName.isEmpty()) {
-	QImage image( renderer.getWidth(), renderer.getHeight(), QImage::Format_RGB32 );
+	QImage image( renderer->getWidth(), renderer->getHeight(), QImage::Format_RGB32 );
 	QPainter painter(&image);
-	drawRendering(painter, renderer, 0, renderer.getHeight(), 0, renderer.getWidth());
+	drawRendering(painter, *renderer, 0, renderer->getHeight(), 0, renderer->getWidth());
 	image.save(fileName, "png");
     }
 }
@@ -85,7 +94,7 @@ void Canvas::paintEvent(QPaintEvent *event)
         y2 = y1 + rect.height(),
         x1 = rect.x(),
         x2 = x1 + rect.width();
-    drawRendering(painter, renderer, y1, y2, x1, x2);
+    drawRendering(painter, *renderer, y1, y2, x1, x2);
 }
 
 void Canvas::keyPressEvent(QKeyEvent *event)
@@ -96,6 +105,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
 	save();
     else if ((event->key() == Qt::Key_R)
 	     || (event->key() == Qt::Key_F5)
+	     || (event->key() == Qt::Key_Space)
 	     || (event->key() == Qt::Key_Return))
 	render();
 }

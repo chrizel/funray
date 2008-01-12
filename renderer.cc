@@ -15,6 +15,7 @@
   You should have received a copy of the GNU General Public License along 
   with this program; if not, see <http://www.gnu.org/licenses/>. */
 
+#include <QDebug>
 #include <QThread>
 
 #include <iostream>
@@ -64,7 +65,7 @@ void Worker::run()
 
     for (int y = from; y < height; y += step) {
 	for (int x = 0; x < width; x++) {
-	    Ray ray(scene.camera.pos, scene.camera.dirVecFor(x, y, width, height));
+	    Ray ray(scene.camera->pos, scene.camera->dirVecFor(x, y, width, height));
 	    renderer.setPixel(x, y, scene.sendRay(ray));
 	}
     }
@@ -74,6 +75,11 @@ void Worker::run()
 
 void Renderer::render()
 {
+    if (!scene.camera) {
+	qDebug() << "Renderer error: No camera defined!";
+	exit(1);
+    }
+
     resetPixels();
     if (listener) listener->renderStart(*this);
 
@@ -89,7 +95,7 @@ void Renderer::render()
 
     for (int y = 0; y < height; y += thread_count + 1) {
 	for (int x = 0; x < width; x++) {
-	    Ray ray(scene.camera.pos, scene.camera.dirVecFor(x, y, width, height));
+	    Ray ray(scene.camera->pos, scene.camera->dirVecFor(x, y, width, height));
 	    setPixel(x, y, scene.sendRay(ray));
 	}
 	if (listener) listener->renderLine(*this, y);

@@ -23,6 +23,7 @@
 #include "camera.h"
 #include "light.h"
 #include "vector.h"
+#include "dela.h"
 
 class Primitive;
 class Ray;
@@ -30,17 +31,28 @@ class Ray;
 typedef std::vector<Primitive*> Prims;
 typedef Prims::const_iterator PrimsIterator;
 
-class Scene
+class Scene : public dela::Scriptable
 {
 public:
     Prims prims;
-    Light light;
-    Camera camera;
+    Light *light;
+    Camera *camera;
 
     Scene();
     virtual ~Scene();
 
     vec sendRay(Ray ray, int counter = 0) const;
+
+    inline void addPrimitive(Primitive *p) { prims.push_back(p); };
+    inline void setCamera(Camera *c) {
+	if (camera) delete camera;
+	camera = c;
+    };
+
+    inline void setLight(Light *l) {
+	if (light) delete light;
+	light = l;
+    };
 };
 
 #endif

@@ -18,7 +18,10 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-class Light
+#include "dela.h"
+#include "vector.h"
+
+class Light : public dela::Scriptable
 {
 public:
     Light(const vec &pos, const vec &color, const double power)

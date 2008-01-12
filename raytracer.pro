@@ -9,5 +9,5 @@ INCLUDEPATH += .
 CONFIG += DEBUG
 
 # Input
-HEADERS += canvas.h vector.h renderer.h camera.h primitives.h light.h scene.h
-SOURCES += canvas.cc main.cc renderer.cc camera.cc scene.cc
+HEADERS += canvas.h vector.h renderer.h camera.h primitives.h light.h scene.h dela.h dela_builtins.h dela_glue.h
+SOURCES += canvas.cc main.cc renderer.cc camera.cc scene.cc dela.cc dela_builtins.cc dela_glue.cc

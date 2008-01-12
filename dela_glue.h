@@ -1,5 +1,5 @@
 /*funray - yet another raytracer
-Copyright (C) 2008  Christian Zeller (chrizel@gmail.com) and
+opyright (C) 2008  Christian Zeller (chrizel@gmail.com) and
                     Simon Goller (neosam@gmail.com).
 
 This program is free software; you can redistribute it and/or modify 
@@ -15,22 +15,10 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along 
 with this program; if not, see <http://www.gnu.org/licenses/>. */
 
-#include <QApplication>
-#include <QDebug>
-#include <QWidget>
-#include <QVBoxLayout>
+#ifndef DELA_GLUE_H
+#define DELA_GLUE_H
 
-#include "canvas.h"
-#include "dela.h"
-#include "dela_builtins.h"
+class dela::Engine;
+extern void addDelaGlue(dela::Engine *e);
 
-int main(int argc, char ** argv)
-{
-    QApplication app(argc, argv);
-    Canvas canvas;
-
-    canvas.show();
-    canvas.render();
-
-    return app.exec();
-}
+#endif

@@ -21,15 +21,16 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 #include <cmath>
 #include <vector>
 
+#include "dela.h"
 #include "vector.h"
 
-class Primitive
+class Primitive : public dela::Scriptable
 {
 public:
     vec color;
     double mirror;
 
-    Primitive(const vec &color, double mirror = 0.5)
+    Primitive(const vec &color, double mirror = 0.3)
 	: color(color), mirror(mirror) {};
     virtual ~Primitive() {};
 

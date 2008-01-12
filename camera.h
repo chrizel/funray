@@ -18,9 +18,10 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "dela.h"
 #include "vector.h"
 
-class Camera
+class Camera : public dela::Scriptable
 {
 public:
     Camera(const vec &pos,

@@ -28,8 +28,8 @@ class Canvas : public QWidget, public RendererListener
     Q_OBJECT
 
 private:
-    Scene scene;
-    Renderer renderer;
+    Scene *scene;
+    Renderer *renderer;
 
 public:
     Canvas(QWidget *parent = 0);

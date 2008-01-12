@@ -15,6 +15,8 @@
   You should have received a copy of the GNU General Public License along 
   with this program; if not, see <http://www.gnu.org/licenses/>. */
 
+#include <QDebug>
+
 #include <vector>
 
 #include "camera.h"
@@ -24,25 +26,25 @@
 #include "vector.h"
 
 Scene::Scene()
-    : light(vec(0.0, 8.0, -1.0), vec(0.2, 0.2, 0.2), 30.0),
-      camera(vec(0, 0, -10), vec(0.0, 0.0, 1.0), 1.333, 1.0)
+    : light(0), camera(0)
 {
-    prims.push_back(new Plane(vec(0, -1.0, 0), vec(0, 1, 0), vec(0, 1, 1)));
-    prims.push_back(new Sphere(vec(0.0, 0.0, 3.0), 1.0, vec(1, 1, 1)));
-    prims.push_back(new Sphere(vec(2.0, 0.0, 2.0), 1.0, vec(1, 1, 1)));
-    prims.push_back(new Sphere(vec(4,   0, 5),  1, vec(0, 0, 1)));
-    prims.push_back(new Sphere(vec(-4,  0, 3),  1, vec(1, 1, 0)));
-    prims.push_back(new Sphere(vec(1,  -0.8, 2),  0.2, vec(1, 0, 1)));
 }
 
 Scene::~Scene()
 {
+    if (camera)
+	delete camera;
     for (PrimsIterator it = prims.begin(); it != prims.end(); it++)
 	delete *it;
 }
 
 vec Scene::sendRay(Ray ray, int count) const
 {
+    if (!light) {
+	qDebug() << "Scene::sendRay error: No light defined";
+	exit(1);
+    }
+
     if (count > 100) {
 	std::cout << "Infinity mirror..." << std::endl;
 	return vec(0.0, 1.0, 1.0);
@@ -63,7 +65,7 @@ vec Scene::sendRay(Ray ray, int count) const
 	vec p = (ray.dir * length) + ray.pos;
     
 	// vector from hit point to light
-	vec toLight = light.pos - p;
+	vec toLight = light->pos - p;
     
 	// Cast ray from hit point to light source,
 	// and check if object is between them...
@@ -82,7 +84,7 @@ vec Scene::sendRay(Ray ray, int count) const
 	vec v = (ray.dir * -1).normal();
     
 	// normalized vector from hitpoint to light...
-	vec l = light.pos - p;
+	vec l = light->pos - p;
 	double len = l.mag(); // length needed for i below
 	l = l.normal();
     
@@ -92,7 +94,7 @@ vec Scene::sendRay(Ray ray, int count) const
 	// halfway vector between view and light vector...
 	vec h = (v + l).normal();
     
-	double i = std::max(1.0 - (len / light.power), 0.0);
+	double i = std::max(1.0 - (len / light->power), 0.0);
     
 	vec col;
     
@@ -100,7 +102,7 @@ vec Scene::sendRay(Ray ray, int count) const
 	    col = vec(0,0,0);
 	else
 	    col = prim->colorAt(p)
-		* light.color
+		* light->color
 		* i
 		* ldexp(std::max(n.dot(h), 0.0), 3);
     
@@ -108,8 +110,7 @@ vec Scene::sendRay(Ray ray, int count) const
     
 	if (prim->getMirror() == 0.0) {
 	    return col;
-	}
-	else {
+	} else {
 	    double x = ray.dir.x;
 	    double y = ray.dir.y;
 	    double z = ray.dir.z;
