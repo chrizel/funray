@@ -73,13 +73,13 @@ vec Scene::sendRay(Ray ray, int count) const
 	bool hit = false;
 	for (PrimsIterator it = prims.begin(); it != prims.end(); it++) {
 	    if (*it == prim)
-		break;
+		continue;
 	    if ((*it)->intercept(sray) > 0) {
 		hit = true;
 		break;
 	    }
 	}
-    
+
 	// normalized vector from hitpoint to viewer...
 	vec v = (ray.dir * -1).normal();
     
@@ -97,16 +97,15 @@ vec Scene::sendRay(Ray ray, int count) const
 	double i = std::max(1.0 - (len / light->power), 0.0);
     
 	vec col;
-    
+	
 	if (hit)
-	    col = vec(0,0,0);
+	    col = prim->colorAt(p)
+		* vec(.1, .1, .1);
 	else
 	    col = prim->colorAt(p)
 		* light->color
 		* i
 		* ldexp(std::max(n.dot(h), 0.0), 3);
-    
-	n = n.normal();
     
 	if (prim->getMirror() == 0.0) {
 	    return col;
@@ -115,15 +114,13 @@ vec Scene::sendRay(Ray ray, int count) const
 	    double y = ray.dir.y;
 	    double z = ray.dir.z;
       
-	    ray.dir = ray.dir.normal();
-      
 	    vec mirrorRayTo((x*(1-2*n.x*n.x) + -2*y*n.x*n.y     + -2*z*n.x*n.z),
-			    (-2*x*n.y*n.x +  y*(1-2*n.y*n.y) + -2*z*n.y*n.z),
-			    (-2*x*n.z*n.x + -2*y*n.z*n.y    + z*(1-2*n.z*n.z)));
+			    (-2*x*n.y*n.x    +  y*(1-2*n.y*n.y) + -2*z*n.y*n.z),
+			    (-2*x*n.z*n.x    + -2*y*n.z*n.y     + z*(1-2*n.z*n.z)));
       
 	    return 
-		sendRay(Ray(p, mirrorRayTo), count+1)*prim->getMirror()+
-		col*(1.0-prim->getMirror());
+		sendRay( Ray(p, mirrorRayTo), count+1) * prim->getMirror()
+		+ col * (1.0 - prim->getMirror());
 	}
     } else {
 	// calculate world color...
