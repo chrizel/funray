@@ -26,12 +26,14 @@ class Camera : public dela::Scriptable
 public:
     Camera(const vec &pos,
            const vec &dir, 
+	   const vec &up,
            double hlen, 
            double vlen);
     virtual ~Camera();
 
     vec pos;
     vec dir;
+    vec up;
     double hlen;
     double vlen;
 

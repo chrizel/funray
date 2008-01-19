@@ -57,7 +57,7 @@ void Renderer::resetPixels()
 
 void Worker::run()
 {
-    std::cout << "Thread " << from << " started." << std::endl;
+    //std::cout << "Thread " << from << " started." << std::endl;
 
     const Scene &scene = renderer.getScene();
     int width = renderer.getWidth();
@@ -70,7 +70,7 @@ void Worker::run()
 	}
     }
 
-    std::cout << "Thread " << from << " finished." << std::endl;
+    //std::cout << "Thread " << from << " finished." << std::endl;
 }
 
 void Renderer::render()
@@ -80,7 +80,6 @@ void Renderer::render()
 	exit(1);
     }
 
-    resetPixels();
     if (listener) listener->renderStart(*this);
 
     const int thread_count = 3;

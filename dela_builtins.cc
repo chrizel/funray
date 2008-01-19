@@ -18,6 +18,7 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 #include <QByteArray>
 #include <QDebug>
 
+#include <cmath>
 #include <iostream>
 
 #include "dela.h"
@@ -97,14 +98,22 @@ static Scriptable *list(Engine * /* e */, List *params)
 
 static Scriptable *set(Engine *e, List *params)
 {
-    if (params->size() == 2) {
-	e->setVariable(ensureType<String>(params->at(0))->value.constData(), params->at(1));
-	return params->at(1);
+    int size = params->size();
+
+    if (size == 0 || (size % 2 == 1)) {
+	qDebug() << "dela::builtins::set error: set parameter count zero or not even";
+	exit(1);
     }
 
-    qDebug() << "dela::builtins::set error: set accepts only two parameters (name value)";
-    exit(1);
-    return 0;
+    Scriptable *name = 0;
+    Scriptable *value = 0;
+    for (List::iterator it = params->begin(); it != params->end(); it += 2) {
+	name  = e->eval(*it);
+	value = e->eval(*(it + 1));
+	e->setVariable(ensureType<String>(name)->value.constData(), value);
+    }
+
+    return value;
 }
 
 static Scriptable *unset(Engine *e, List *params)
@@ -139,10 +148,10 @@ static Scriptable *for_loop(Engine *e, List *params)
     }
 
     // Read loop parameters...
-    QByteArray var = ensureType<String>(list->at(0))->value;
-    double from = ensureType<Number>(list->at(1))->value;
-    double to   = ensureType<Number>(list->at(2))->value;
-    double step = (list->size() > 3) ? ensureType<Number>(list->at(3))->value : 1.0;
+    QByteArray var = ensureType<String>(e->eval(list->at(0)))->value;
+    double from = ensureType<Number>(e->eval(list->at(1)))->value;
+    double to   = ensureType<Number>(e->eval(list->at(2)))->value;
+    double step = (list->size() > 3) ? ensureType<Number>(e->eval(list->at(3)))->value : 1.0;
 
     // Loop...
     Number *n = e->autorelease(new Number(from));
@@ -158,11 +167,33 @@ static Scriptable *for_loop(Engine *e, List *params)
     return result;
 }
 
-Scriptable *dela::begin(Engine * /* e */, List *params)
+static Scriptable *begin(Engine * /* e */, List *params)
 {
     if (!params->empty())
 	return params->last();
     return 0;
+}
+
+static Scriptable *sin(Engine *e, List *params)
+{
+    if (params->size() != 1) {
+	qDebug() << "dela::sin error: wrong number of arguments";
+	exit(1);
+    }
+
+    double x = sin(ensureType<Number>(params->at(0))->value);
+    return e->autorelease(new Number(x));
+}
+
+static Scriptable *cos(Engine *e, List *params)
+{
+    if (params->size() != 1) {
+	qDebug() << "dela::cos error: wrong number of arguments";
+	exit(1);
+    }
+
+    double x = cos(ensureType<Number>(params->at(0))->value);
+    return e->autorelease(new Number(x));
 }
 
 void dela::addBuiltins(Engine *e) 
@@ -171,11 +202,14 @@ void dela::addBuiltins(Engine *e)
     e->addFunction("-",       &minus);
     e->addFunction("*",       &multiply);
     e->addFunction("/",       &divide);
+    e->addFunction("sin",     &sin);
+    e->addFunction("cos",     &cos);
+
     e->addFunction("display", &display);
     e->addFunction("begin",   &begin);
     e->addFunction("list",    &list);
-    e->addFunction("set",     &set);
     e->addFunction("unset",   &unset);
 
+    e->addMacro("set",        &set);
     e->addMacro("for",        &for_loop);
 }    

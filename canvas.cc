@@ -102,6 +102,7 @@ void Canvas::render()
 	QTime t;
 	t.start();
 	renderer->render();
+	saveToFile("last_render.png");
 	std::cout << "Finished in " << t.elapsed() << " ms." << std::endl;
     }
 }
@@ -111,12 +112,18 @@ void Canvas::save()
     if (renderer) {
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
 							"", tr("Images (*.png)"));
-	if (!fileName.isEmpty()) {
-	    QImage image( renderer->getWidth(), renderer->getHeight(), QImage::Format_RGB32 );
-	    QPainter painter(&image);
-	    drawRendering(painter, *renderer, 0, renderer->getHeight(), 0, renderer->getWidth());
-	    image.save(fileName, "png");
-	}
+	if (!fileName.isEmpty())
+	    saveToFile(fileName);
+    }
+}
+
+void Canvas::saveToFile(const QString &fileName)
+{
+    if (renderer) {
+	QImage image( renderer->getWidth(), renderer->getHeight(), QImage::Format_RGB32 );
+	QPainter painter(&image);
+	drawRendering(painter, *renderer, 0, renderer->getHeight(), 0, renderer->getWidth());
+	image.save(fileName, "png");
     }
 }
 

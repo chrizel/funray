@@ -43,9 +43,7 @@ public:
     virtual void paintEvent(QPaintEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
 
-    virtual void renderStart(Renderer & /* renderer */) {
-	repaint();
-    };
+    virtual void renderStart(Renderer & /* renderer */) {};
 
     virtual void renderEnd(Renderer & /* renderer */) {
 	repaint();
@@ -61,6 +59,7 @@ public:
 public slots:
     void render();
     void save();
+    void saveToFile(const QString &fileName);
 
 private slots:
     void fileChanged(const QString &path);

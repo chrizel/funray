@@ -22,10 +22,12 @@
 
 Camera::Camera(const vec &pos, 
 	       const vec &dir, 
+	       const vec &up,
 	       double hlen, 
 	       double vlen)
     : pos(pos), 
       dir(dir.normal()), 
+      up(up.normal()),
       hlen(hlen), 
       vlen(vlen) 
 {

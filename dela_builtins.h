@@ -21,11 +21,7 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 namespace dela {
 
     class Engine;    
-    class Scriptable;
-    class List;
-
     void addBuiltins(Engine *e);
-    Scriptable *begin(Engine *e, List *params);
 
 }
 

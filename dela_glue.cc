@@ -103,10 +103,15 @@ static dela::Scriptable* camera(dela::Engine *e, dela::List *params)
 		  e->readNumberPropDef(params, "direction", 1, 0),
 		  e->readNumberPropDef(params, "direction", 2, 1));
 
+    vec up = vec(e->readNumberPropDef(params, "up", 0, 0),
+		 e->readNumberPropDef(params, "up", 1, 1),
+		 e->readNumberPropDef(params, "up", 2, 0));
+
+
     double hlen = e->readNumberPropDef(params, "hlen", 0, 1.333);
     double vlen = e->readNumberPropDef(params, "vlen", 0, 1.0);
 
-    Camera *camera = new Camera(pos, dir, hlen, vlen);
+    Camera *camera = new Camera(pos, dir, up, hlen, vlen);
     curScene->setCamera(camera);
     return camera;
 }
