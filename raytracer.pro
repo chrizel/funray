@@ -7,6 +7,7 @@ TARGET =
 DEPENDPATH += .
 INCLUDEPATH += .
 CONFIG += DEBUG
+QT += opengl
 
 # Input
 HEADERS += canvas.h vector.h renderer.h camera.h primitives.h light.h scene.h dela.h dela_builtins.h dela_glue.h

@@ -23,8 +23,8 @@
 Camera::Camera(const vec &pos, 
 	       const vec &dir, 
 	       const vec &up,
-	       double hlen, 
-	       double vlen)
+	       float hlen, 
+	       float vlen)
     : pos(pos), 
       dir(dir.normal()), 
       up(up.normal()),
@@ -46,8 +46,8 @@ const vec Camera::dirVecFor(int x, int y, int width, int height) const {
     vec b = dir;
 
     // angle between vector a and b:
-    double ct = a.dot(b);
-    double st = sin(acos(ct));
+    float ct = a.dot(b);
+    float st = sin(acos(ct));
 
     // calculate perpendicular vector from a and b
     vec n = xproduct(a, b).normal();

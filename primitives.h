@@ -28,36 +28,36 @@ class Primitive : public dela::Scriptable
 {
 public:
     vec color;
-    double mirror;
+    float mirror;
 
-    Primitive(const vec &color, double mirror = 0.3)
+    Primitive(const vec &color, float mirror = 0.3)
 	: color(color), mirror(mirror) {};
     virtual ~Primitive() {};
 
-    virtual double intercept(const Ray &ray) = 0;
+    virtual float intercept(const Ray &ray) = 0;
     virtual const vec normalAt(vec &point) = 0;
 
     virtual const vec colorAt(vec & /* point */) {
         return color;
     };
 
-    virtual double getMirror() { return mirror; };
-    virtual void setMirror(double mirror) { this->mirror = mirror; };
+    virtual float getMirror() { return mirror; };
+    virtual void setMirror(float mirror) { this->mirror = mirror; };
 };
 
 class Sphere : public Primitive
 {
 public:
-    Sphere(const vec &pos, double radius, const vec &color) 
+    Sphere(const vec &pos, float radius, const vec &color) 
         : Primitive(color), pos(pos), radius(radius) {};
 
     vec pos;
-    double radius;
+    float radius;
 
-    virtual double intercept(const Ray &ray) {
+    virtual float intercept(const Ray &ray) {
       vec e = pos - ray.pos;
-      double a = e.dot(ray.dir);
-      double f = sqrt(radius * radius - (e.dot(e)) + (a * a));
+      float a = e.dot(ray.dir);
+      float f = sqrt(radius * radius - (e.dot(e)) + (a * a));
       return a - f;
     };
 
@@ -65,9 +65,9 @@ public:
     virtual const vec normalAt(vec &point) {
 	/*
 	vec v = (point - pos).normal(); 
-	double r1 = 0.1 * (rand() % 100) / 100.0; 
-	double r2 = 0.1 * (rand() % 100) / 100.0;
-	double r3 = 0.1 * (rand() % 100) / 100.0;
+	float r1 = 0.1 * (rand() % 100) / 100.0; 
+	float r2 = 0.1 * (rand() % 100) / 100.0;
+	float r3 = 0.1 * (rand() % 100) / 100.0;
 	return (v + vec(r1, r2, r3)).normal();
 	*/
 
@@ -84,10 +84,10 @@ public:
     vec pos;
     vec normal;
 
-    virtual double intercept(const Ray &ray) {
-        double d = pos.dot(normal);
-        double a = d - ray.pos.dot(normal);
-        double b = ray.dir.dot(normal);
+    virtual float intercept(const Ray &ray) {
+        float d = pos.dot(normal);
+        float a = d - ray.pos.dot(normal);
+        float b = ray.dir.dot(normal);
         return a / b;
     };
 

@@ -51,9 +51,9 @@ vec Scene::sendRay(Ray ray, int count) const
     }
   
     Primitive *prim = 0;
-    double length  = -1;
+    float length  = -1;
     for (PrimsIterator it = prims.begin(); it != prims.end(); it++) {
-	double len = (*it)->intercept(ray);
+	float len = (*it)->intercept(ray);
 	if ( (len > 0.0001) && ((length < 0) || (len < length)) ) {
 	    prim = *it;
 	    length = len;
@@ -85,7 +85,7 @@ vec Scene::sendRay(Ray ray, int count) const
     
 	// normalized vector from hitpoint to light...
 	vec l = light->pos - p;
-	double len = l.mag(); // length needed for i below
+	float len = l.mag(); // length needed for i below
 	l = l.normal();
     
 	// normal vector for hitpoint...
@@ -94,7 +94,7 @@ vec Scene::sendRay(Ray ray, int count) const
 	// halfway vector between view and light vector...
 	vec h = (v + l).normal();
     
-	double i = std::max(1.0 - (len / light->power), 0.0);
+	float i = std::max(1.0 - (len / light->power), 0.0);
     
 	vec col;
 	
@@ -105,14 +105,14 @@ vec Scene::sendRay(Ray ray, int count) const
 	    col = prim->colorAt(p)
 		* light->color
 		* i
-		* ldexp(std::max(n.dot(h), 0.0), 3);
+		* ldexp(std::max(n.dot(h), 0.0f), 3);
     
 	if (prim->getMirror() == 0.0) {
 	    return col;
 	} else {
-	    double x = ray.dir.x;
-	    double y = ray.dir.y;
-	    double z = ray.dir.z;
+	    float x = ray.dir.x;
+	    float y = ray.dir.y;
+	    float z = ray.dir.z;
       
 	    vec mirrorRayTo((x*(1-2*n.x*n.x) + -2*y*n.x*n.y     + -2*z*n.x*n.z),
 			    (-2*x*n.y*n.x    +  y*(1-2*n.y*n.y) + -2*z*n.y*n.z),
@@ -125,7 +125,7 @@ vec Scene::sendRay(Ray ray, int count) const
     } else {
 	// calculate world color...
 	vec q = ray.dir * 100;
-	double fac = q.y / 20.0;
+	float fac = q.y / 20.0;
 	return vec(1.0 - (0.4 * fac), 1.0 - (0.2 * fac), 1.0);
     }
 }

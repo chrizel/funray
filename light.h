@@ -24,12 +24,12 @@
 class Light : public dela::Scriptable
 {
 public:
-    Light(const vec &pos, const vec &color, const double power)
+    Light(const vec &pos, const vec &color, const float power)
         : pos(pos), color(color), power(power) {};
 
     vec pos;
     vec color;
-    double power;
+    float power;
 };
 
 #endif

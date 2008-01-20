@@ -18,13 +18,14 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 #ifndef CANVAS_H
 #define CANVAS_H
 
+#include <QGLWidget>
 #include <QWidget>
 #include <QFileSystemWatcher>
 
 #include "scene.h"
 #include "renderer.h"
 
-class Canvas : public QWidget, public RendererListener
+class Canvas : public QGLWidget, public RendererListener
 {
     Q_OBJECT
 
@@ -40,17 +41,23 @@ public:
     Canvas(QWidget *parent = 0);
     virtual ~Canvas();
 
-    virtual void paintEvent(QPaintEvent *event);
+    //virtual void paintEvent(QPaintEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
+
+    void initializeGL();
+    void resizeGL(int w, int h);
+    void paintGL();
 
     virtual void renderStart(Renderer & /* renderer */) {};
 
     virtual void renderEnd(Renderer & /* renderer */) {
-	repaint();
+	//repaint();
+	updateGL();
     };
 
     virtual void renderLine(Renderer &  renderer, int line) {
-	repaint(0, line, renderer.getWidth(), 1);
+	//repaint(0, line, renderer.getWidth(), 1);
+	updateGL();
     };
 
     bool loadScene(const QString &fileName);

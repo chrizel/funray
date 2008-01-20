@@ -32,7 +32,7 @@ namespace dela {
 Scriptable * Engine::recogToken(QByteArray str)
 {
     bool ok = false;
-    double v = str.toDouble(&ok);
+    float v = str.toDouble(&ok);
     if (ok)
 	return autorelease(new Number(v));
     else

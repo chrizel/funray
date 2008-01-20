@@ -53,7 +53,7 @@ static dela::Scriptable* sphere(dela::Engine *e, dela::List *params)
 		  e->readNumberProp(params, "position", 1),
 		  e->readNumberProp(params, "position", 2));
 
-    double radius = e->readNumberPropDef(params, "radius", 0, 1);
+    float radius = e->readNumberPropDef(params, "radius", 0, 1);
 
     vec color = vec(e->readNumberPropDef(params, "color", 0, 1),
 		    e->readNumberPropDef(params, "color", 1, 1),
@@ -108,8 +108,8 @@ static dela::Scriptable* camera(dela::Engine *e, dela::List *params)
 		 e->readNumberPropDef(params, "up", 2, 0));
 
 
-    double hlen = e->readNumberPropDef(params, "hlen", 0, 1.333);
-    double vlen = e->readNumberPropDef(params, "vlen", 0, 1.0);
+    float hlen = e->readNumberPropDef(params, "hlen", 0, 1.333);
+    float vlen = e->readNumberPropDef(params, "vlen", 0, 1.0);
 
     Camera *camera = new Camera(pos, dir, up, hlen, vlen);
     curScene->setCamera(camera);
@@ -132,7 +132,7 @@ static dela::Scriptable* light(dela::Engine *e, dela::List *params)
 		    e->readNumberPropDef(params, "color", 1, .2),
 		    e->readNumberPropDef(params, "color", 2, .2));
 
-    double power = e->readNumberPropDef(params, "power", 0, 30.0);
+    float power = e->readNumberPropDef(params, "power", 0, 30.0);
 
     Light *light = new Light(pos, color, power);
     curScene->setLight(light);

@@ -28,7 +28,7 @@ using namespace dela;
 
 static Scriptable *plus(Engine *e, List *params)
 {
-    double result = 0;
+    float result = 0;
     for (List::iterator it = params->begin(); it != params->end(); it++)
 	result += ensureType<Number>(*it)->value;
     return e->autorelease(new Number(result));
@@ -39,7 +39,7 @@ static Scriptable *minus(Engine *e, List *params)
     int size = params->size();
 
     if (size > 1) {
-	double result = ensureType<Number>(params->first())->value;
+	float result = ensureType<Number>(params->first())->value;
 	for (List::iterator it = params->begin() + 1; it != params->end(); it++) {
 	    result -= ensureType<Number>(*it)->value;
 	}
@@ -56,7 +56,7 @@ static Scriptable *multiply(Engine *e, List *params)
     int size = params->size();
 
     if (size > 0) {
-	double result = ensureType<Number>(params->first())->value;
+	float result = ensureType<Number>(params->first())->value;
 	for (List::iterator it = params->begin() + 1; it != params->end(); it++) {
 	    result *= ensureType<Number>(*it)->value;
 	}
@@ -71,7 +71,7 @@ static Scriptable *divide(Engine *e, List *params)
     int size = params->size();
 
     if (size > 0) {
-	double result = ensureType<Number>(params->first())->value;
+	float result = ensureType<Number>(params->first())->value;
 	for (List::iterator it = params->begin() + 1; it != params->end(); it++) {
 	    result /= ensureType<Number>(*it)->value;
 	}
@@ -149,9 +149,9 @@ static Scriptable *for_loop(Engine *e, List *params)
 
     // Read loop parameters...
     QByteArray var = ensureType<String>(e->eval(list->at(0)))->value;
-    double from = ensureType<Number>(e->eval(list->at(1)))->value;
-    double to   = ensureType<Number>(e->eval(list->at(2)))->value;
-    double step = (list->size() > 3) ? ensureType<Number>(e->eval(list->at(3)))->value : 1.0;
+    float from = ensureType<Number>(e->eval(list->at(1)))->value;
+    float to   = ensureType<Number>(e->eval(list->at(2)))->value;
+    float step = (list->size() > 3) ? ensureType<Number>(e->eval(list->at(3)))->value : 1.0;
 
     // Loop...
     Number *n = e->autorelease(new Number(from));
@@ -181,7 +181,7 @@ static Scriptable *sin(Engine *e, List *params)
 	exit(1);
     }
 
-    double x = sin(ensureType<Number>(params->at(0))->value);
+    float x = sin(ensureType<Number>(params->at(0))->value);
     return e->autorelease(new Number(x));
 }
 
@@ -192,7 +192,7 @@ static Scriptable *cos(Engine *e, List *params)
 	exit(1);
     }
 
-    double x = cos(ensureType<Number>(params->at(0))->value);
+    float x = cos(ensureType<Number>(params->at(0))->value);
     return e->autorelease(new Number(x));
 }
 

@@ -25,7 +25,6 @@
 #include "renderer.h"
 #include "vector.h"
 
-
 Worker::Worker(Renderer &renderer, int from, int step) 
     : renderer(renderer),
       from(from),
@@ -82,7 +81,7 @@ void Renderer::render()
 
     if (listener) listener->renderStart(*this);
 
-    const int thread_count = 3;
+    const int thread_count = 4;
 
     Worker **workers = new Worker*[thread_count];
 

@@ -21,6 +21,7 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 #include <QDebug>
 #include <QFileDialog>
 #include <QFileSystemWatcher>
+#include <QGLWidget>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QTime>
@@ -48,7 +49,7 @@ static void drawRendering(QPainter &painter, Renderer &renderer,
 }
 
 Canvas::Canvas(QWidget *parent)
-    : QWidget(parent),
+    : QGLWidget(parent),
       watcher(this),
       scene(0),
       renderer(0)
@@ -83,8 +84,7 @@ bool Canvas::loadScene(const QString &name)
 	renderer = new Renderer(*scene, 640, 480);
 
 	renderer->setListener(this);
-	setMinimumSize(renderer->getWidth(), renderer->getHeight());
-	setMaximumSize(renderer->getWidth(), renderer->getHeight());
+	resize(renderer->getWidth(), renderer->getHeight());
 
 	this->fileName = name;
 
@@ -126,7 +126,7 @@ void Canvas::saveToFile(const QString &fileName)
 	image.save(fileName, "png");
     }
 }
-
+/*
 void Canvas::paintEvent(QPaintEvent *event)
 {
     if (renderer) {
@@ -138,6 +138,26 @@ void Canvas::paintEvent(QPaintEvent *event)
 	    x2 = x1 + rect.width();
 	drawRendering(painter, *renderer, y1, y2, x1, x2);
     }
+}
+*/
+
+void Canvas::initializeGL()
+{
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glShadeModel(GL_FLAT);
+}
+
+void Canvas::resizeGL(int w, int h)
+{
+}
+
+void Canvas::paintGL()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    glRasterPos2i(-1, 1);
+    glPixelZoom(1.0, -1.0);
+    glDrawPixels(renderer->getWidth(), renderer->getHeight(), GL_RGB, GL_FLOAT, renderer->pixels);
+    glFlush();
 }
 
 void Canvas::keyPressEvent(QKeyEvent *event)

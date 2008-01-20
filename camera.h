@@ -27,15 +27,15 @@ public:
     Camera(const vec &pos,
            const vec &dir, 
 	   const vec &up,
-           double hlen, 
-           double vlen);
+           float hlen, 
+           float vlen);
     virtual ~Camera();
 
     vec pos;
     vec dir;
     vec up;
-    double hlen;
-    double vlen;
+    float hlen;
+    float vlen;
 
     const vec dirVecFor(int x, int y, int width, int height) const;
 };

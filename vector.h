@@ -24,37 +24,37 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 
 struct vec {
 public:
-    double x, y, z;
+    float x, y, z;
 
     vec() : x(0), y(0), z(0) {};
-    vec(double x, double y, double z) : x(x), y(y), z(z) {};
+    vec(float x, float y, float z) : x(x), y(y), z(z) {};
 
-    double mag() const { 
+    float mag() const { 
         return sqrt(x*x + y*y + z*z); 
     };
 
     const vec normal() const {
-        double m = this->mag();
+        float m = this->mag();
         return (m > 0) ? (*this / m) : *this;
     };
 
-    double dot(const vec &other) const {
+    float dot(const vec &other) const {
         return (x * other.x)
              + (y * other.y)
              + (z * other.z);
     };
 
-    const vec clamp(const double &min = 0.0, const double &max = 1.0) const {
+    const vec clamp(const float &min = 0.0, const float &max = 1.0) const {
         return vec(std::max(min, std::min(max, x)),
                    std::max(min, std::min(max, y)),
                    std::max(min, std::min(max, z)));
     };
 
-    const vec operator*(const double &s) const {
+    const vec operator*(const float &s) const {
         return vec(x * s, y * s, z * s);
     };
     
-    const vec operator/(const double &s) const {
+    const vec operator/(const float &s) const {
         return vec(x / s, y / s, z / s);
     };
 

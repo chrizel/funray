@@ -90,7 +90,7 @@ public:
 class Number : public Scriptable
 {
 public:
-    Number(double value) : value(value) {
+    Number(float value) : value(value) {
 	//qDebug() << "New number: " << value;
     };
     virtual ~Number() {
@@ -101,7 +101,7 @@ public:
 	return QByteArray::number(value);
     };
 
-    double value;
+    float value;
 };
 
 class List : public QList<Scriptable *>, public Scriptable
@@ -158,11 +158,11 @@ public:
     void unsetVariable(QByteArray name) { variables.remove(name); };
 
     Scriptable* readProperty(List *params, const QByteArray &name, int index);
-    inline double readNumberProp(List *params, const QByteArray &name, int index) {
+    inline float readNumberProp(List *params, const QByteArray &name, int index) {
 	return ensureType<Number>(readProperty(params, name, index))->value;
     };
-    inline double readNumberPropDef(List *params, const QByteArray &name, 
-				    int index, double def) {
+    inline float readNumberPropDef(List *params, const QByteArray &name, 
+				    int index, float def) {
 	Number *n = asType<Number>(readProperty(params, name, index));
 	return n ? n->value : def;
     };

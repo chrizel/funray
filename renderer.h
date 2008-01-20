@@ -56,11 +56,11 @@ private:
     int height;
     RendererListener *listener;
 
-    vec *pixels;
     void resetPixels();
 
 public:
 
+    vec *pixels;
 
     Renderer(const Scene &scene, int width, int height);
     virtual ~Renderer();
