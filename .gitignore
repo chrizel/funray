@@ -1,4 +1,3 @@
-syntax: glob
 *.o
 *.swp
 Makefile
