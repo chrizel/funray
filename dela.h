@@ -34,7 +34,7 @@ class Scriptable
 public:
     virtual ~Scriptable() {};
     virtual QByteArray toString() {
-	return "{Scriptable <0x" + QByteArray::number((int)this, 16) + ">}";
+	return "{Scriptable <0x" + QByteArray::number((qulonglong)this, 16) + ">}";
     };
 };
 
