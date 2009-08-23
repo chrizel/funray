@@ -2,7 +2,7 @@
 *.swp
 Makefile
 moc_*.cpp
-raytracer
+funray
 last_render.png
 *~
 *#
