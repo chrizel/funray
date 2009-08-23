@@ -18,7 +18,8 @@ with this program; if not, see <http://www.gnu.org/licenses/>. */
 #ifndef DELA_GLUE_H
 #define DELA_GLUE_H
 
-class dela::Engine;
+#include "dela.h"
+
 extern void addDelaGlue(dela::Engine *e);
 
 #endif

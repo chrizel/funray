@@ -197,32 +197,6 @@ void Engine::deleteScriptable(Scriptable *s)
     delete s;
 }
 
-template <class T>
-T Engine::autorelease(T s) 
-{
-    if (s && !autoreleasePool->contains(s)) {
-	autoreleasePool->append(s);
-    }
-    return s;
-}
-
-template <class T>
-T Engine::undoAutorelease(T s) 
-{
-    if (autoreleasePool->contains(s)) {
-	List *list = asType<List>(s);
-	if (list) {
-	    List::iterator it;
-	    for (it = list->begin(); it != list->end(); it++)
-		undoAutorelease(*it);
-	}
-
-	autoreleasePool->removeAll(s);
-    }
-
-    return s;
-}
-
 Scriptable* Engine::readProperty(List *params, const QByteArray &name, int index)
 {
     index++;

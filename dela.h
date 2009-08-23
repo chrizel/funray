@@ -168,10 +168,27 @@ public:
     };
 
     template <class T>
-    T autorelease(T s);
+    T autorelease(T s) {
+        if (s && !autoreleasePool->contains(s)) {
+            autoreleasePool->append(s);
+        }
+        return s;
+    }
 
     template <class T>
-    T undoAutorelease(T s);
+    T undoAutorelease(T s) {
+        if (autoreleasePool->contains(s)) {
+            List *list = asType<List>(s);
+            if (list) {
+                List::iterator it;
+                for (it = list->begin(); it != list->end(); it++)
+                    undoAutorelease(*it);
+            }
+
+            autoreleasePool->removeAll(s);
+        }
+        return s;
+    }
 
     static void deleteScriptable(Scriptable *s);
 };

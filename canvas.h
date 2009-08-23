@@ -55,7 +55,7 @@ public:
 	updateGL();
     };
 
-    virtual void renderLine(Renderer &  renderer, int line) {
+    virtual void renderLine(Renderer &, int) {
 	//repaint(0, line, renderer.getWidth(), 1);
 	updateGL();
     };

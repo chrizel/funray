@@ -147,7 +147,7 @@ void Canvas::initializeGL()
     glShadeModel(GL_FLAT);
 }
 
-void Canvas::resizeGL(int w, int h)
+void Canvas::resizeGL(int, int)
 {
 }
 
