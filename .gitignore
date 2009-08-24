@@ -3,6 +3,7 @@
 Makefile
 moc_*.cpp
 funray
+funray.app/
 last_render.png
 *~
 *#
